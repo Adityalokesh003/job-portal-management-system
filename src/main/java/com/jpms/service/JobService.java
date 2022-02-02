@@ -19,4 +19,6 @@ public interface JobService {
 
 	void togglePublish(Long jobId);
 
+	List<Job> findByLocationsContaining(String location);
+
 }

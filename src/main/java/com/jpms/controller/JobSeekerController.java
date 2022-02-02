@@ -1,5 +1,6 @@
 package com.jpms.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpSession;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.jpms.entity.Job;
 import com.jpms.entity.JobSeeker;
 import com.jpms.entity.User;
 import com.jpms.exception.JobSeekerNotFoundException;
@@ -51,7 +53,7 @@ public class JobSeekerController {
 		user = userService.findByUserName(userName);
 		mv.addObject("user", user);
 		mv.addObject("jobseekerId", jobseekerId);
-		mv = new ModelAndView("jobseeker-home");
+		mv = new ModelAndView("jobseeker/jobseeker-home");
 		return mv;
 	}
 
@@ -62,7 +64,7 @@ public class JobSeekerController {
 		JobSeeker jobSeeker = jobSeekerService.findByUserId(((User) httpSession.getAttribute("user")).getId());
 
 		if (jobSeeker != null) {
-			mv.setViewName("redirect:/jobseekers/" + jobSeeker.getId());
+			mv.setViewName("redirect:/jobseekers/" + jobSeeker.getId() + "/jobs");
 			return mv;
 		}
 		mv.setViewName("jobseeker/jobseeker_create_form");
@@ -115,10 +117,13 @@ public class JobSeekerController {
 
 	}
 
-	@GetMapping("/jobs")
-	public ModelAndView findJobs(ModelAndView mv) {
-		jobService.findAll();
-
+	@GetMapping("/{jobSeekerId}/jobs")
+	public ModelAndView findJobs(@PathVariable Long jobSeekerId, ModelAndView mv) {
+		JobSeeker jobSeeker = jobSeekerService.findById(jobSeekerId).get();
+		List<Job> jobs = jobService.findByLocationsContaining(jobSeeker.getLocation().trim());
+		mv.addObject("jobs", jobs);
+		mv.addObject("jobseekerId", jobSeekerId);
+		mv.setViewName("jobseeker/jobseeker-jobs");
 		return mv;
 	}
 

@@ -73,4 +73,10 @@ public class JobServiceImpl implements JobService {
 
 	}
 
+	@Override
+	public List<Job> findByLocationsContaining(String location) {
+		// TODO Auto-generated method stub
+		return jobRepository.findByLocationsContainingAndActive(location, 1);
+	}
+
 }
